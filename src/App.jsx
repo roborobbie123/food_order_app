@@ -20,6 +20,29 @@ function App() {
     setMeals(data);
   }
 
+  async function addOrder(orderData) {
+    try {
+      const response = await fetch('http://localhost:3000/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+
+    } catch (err) {
+      console.log(err);
+    }
+    setIsCartOpen(false);
+    setIsCheckoutOpen(false);
+    setCart(null);
+  }
+
   useEffect(() => {
     fetchMeals();
   }, []);
@@ -41,11 +64,12 @@ function App() {
 
   function showCartModal() {
     setIsCartOpen(prevState => !prevState);
+    console.log(cart)
   }
 
   function showCheckoutModal() {
     setIsCheckoutOpen(prevState => !prevState);
-    console.log('checkou')
+    console.log('checkout')
   }
 
   function removeFromCart(id) {
@@ -66,7 +90,7 @@ function App() {
         <Cart cart={cart} remove={removeFromCart} close={showCartModal} checkout={showCheckoutModal} total={total} />
       </Modal>
       <Modal open={isCheckoutOpen}>
-        <Checkout open={showCheckoutModal} total={total} />
+        <Checkout open={showCheckoutModal} total={total} addOrder={addOrder} cart={cart} />
       </Modal>
       <Meals cart={cart} meals={meals} add={addToCart} remove={removeFromCart} />
     </>
